@@ -7,7 +7,7 @@ contains
 subroutine lattice_gen( s , coord, phi)
     integer, intent(out):: s(l_box**2), coord(2, l_box**2)
     real(8), intent(out) :: phi(l_box**2)
-    integer :: i, j, k, n, random_list((l_box**2)/2)
+    integer :: i, j, n, random_list((l_box**2)/2)
     n = 0
     call choose_half_random(l_box ** 2, random_list)
     do i = 1, l_box
@@ -25,10 +25,9 @@ subroutine lattice_gen( s , coord, phi)
     end do
 end subroutine lattice_gen
 
-subroutine neighbor (s, index, neigh_lst)
-    integer, intent(in) :: s(l_box**2), index
+subroutine neighbor (index, neigh_lst)
+    integer, intent(in) :: index
     integer, intent(out) :: neigh_lst(4) !left, right, up, down
-    integer, intent(out) :: neight_sum
     
    if (mod(index -1 , l_box) == 0) then
         neigh_lst(1) = index + l_box - 1 ! left
