@@ -11,13 +11,22 @@ DBFLAGS = -g -fcheck=all -fbacktrace -ffpe-trap=invalid,zero,overflow
 # FLAGS DE OPTIMIZACIÓN (PRODUCCIÓN)
 PRODFLAGS = -O2
 
+#Flags de profiling
+PROFFLAGS = -pg
+
 # Por defecto usamos producción, a menos que se diga lo contrario
 FFLAGS = $(PRODFLAGS) -Wall -I/usr/local/include/fgsl
 LDFLAGS = `pkg-config --libs fgsl`
 
-# --- Si escribes 'make DEBUG=1', se usarán los flags de depuración ---
+# 'make DEBUG=1'
 ifeq ($(DEBUG), 1)
     FFLAGS = $(DBFLAGS) -Wall -I/usr/local/include/fgsl
+endif
+
+# 'make PROF=1'
+ifeq ($(PROF), 1)
+    FFLAGS += $(PROFFLAGS)
+    LDFLAGS += $(PROFFLAGS)
 endif
 
 # ... (resto del Makefile igual: TARGET, OBJ, reglas de dependencia) ...
@@ -44,6 +53,6 @@ m_MC_step.o: m_MC_step.f90 m_constants.o m_tower.o magnitudes.o m_ran_gen.o
 main.o: main.f90 m_MC_step.o m_ran_gen.o magnitudes.o m_tower.o m_latt_gen.o m_constants.o
 
 clean:
-	rm -f $(OBJ) *.mod $(TARGET)
+	rm -f $(OBJ) *.mod $(TARGET) gmon.out analisis.txt
 
 .PHONY: all clean

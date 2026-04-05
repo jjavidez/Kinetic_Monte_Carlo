@@ -6,6 +6,15 @@ program kin_MC
     use m_latt_gen
     implicit none
 
+    integer :: s(l_box**2), coord(2, l_box**2)
+    integer :: step, tries, accepted_moves, rejected_moves
+    integer, allocatable :: r_vector(:, :)
+    real(8) :: energy, time, x_pol, y_pol
+    real(8) :: phi(l_box**2)
+    real(8), allocatable :: w_vector(:), r_prob(:)
+    logical :: move_accepted
+
+
     !Start RNG
     call init_rng(seed)
 
@@ -37,7 +46,10 @@ program kin_MC
     rejected_moves = 0
 
     do step = 1, n_steps
-        call MC_step(s, tries, coord, phi, energy, accepted_moves, rejected_moves, move_accepted)
+        call MC_step(s, tries, coord, phi, energy, &
+        accepted_moves, rejected_moves, move_accepted, &
+        r_vector, r_prob)
+        !print *, "Step: ", step
         if(move_accepted) then
             call MC_time(time, tries, w_vector )
             tries = 0
@@ -51,6 +63,9 @@ program kin_MC
         
         end if
     end do
+
+    print *, 'accepted moves: ', accepted_moves
+    print *, 'rejected moves: ', rejected_moves
 
     close(1)
     close(2)

@@ -23,6 +23,7 @@ subroutine lattice_gen( s , coord, phi)
             phi(n) = get_random() * 2.0d0 - 1.0d0 !random potential between -1 and 1
         end do
     end do
+    print *, "Initial configuration generated."
 end subroutine lattice_gen
 
 subroutine neighbor (index, neigh_lst)

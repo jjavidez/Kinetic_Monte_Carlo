@@ -14,7 +14,6 @@ function x_polarization(s, coord) result(x_pol)
     do i = 1, l_box**2
         x_pol = x_pol + coord(1, i) * s(i) ! sum of x_i * s_i
     end do
-    
 end function x_polarization
 
 function y_polarization(s, coord) result(y_pol)
@@ -25,7 +24,6 @@ function y_polarization(s, coord) result(y_pol)
     do i = 1, l_box**2
         y_pol = y_pol + coord(2, i) * s(i) ! sum of y_i * s_i
     end do
-    
 end function y_polarization
 
 function random_pot(s, phi) result(rand_pot)
@@ -69,7 +67,6 @@ function initial_energy_calc(s, phi) result(init_energy)
     el_energy = el_field * real(x_polarization(s, coord), 8) ! energy from electric field
     
     init_energy = real(coul_energy, 8) + rand_pot + el_energy ! total energy
-    
 end function initial_energy_calc
 
 function energy_change(s, dist, i, j, phi, coord) result(delta_energy)

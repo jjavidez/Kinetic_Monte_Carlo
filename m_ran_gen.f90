@@ -45,19 +45,18 @@ contains
         integer :: i, rand_numb
 
         do i = 1, lenght/2
-            rand_numb = int(get_random() * lenght + 0.5d0)
+            rand_numb = int(get_random() * lenght )+ 1
             !We cycle for the first one to avoid error
             if (i == 1) then
                 rand_list(i) = rand_numb
                 cycle
             end if
             !If random number is in the list, get another one
-            do while (all(rand_numb /= rand_list(1:i-1)))
-                rand_numb = int(get_random() * lenght + 0.5d0)
+            do while (all(rand_numb == rand_list(1:i-1)))
+                rand_numb = int(get_random() * lenght )+ 1
             end do
             rand_list(i) = rand_numb
         end do
-
     end subroutine choose_half_random
 
 end module m_ran_gen
