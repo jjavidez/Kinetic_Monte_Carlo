@@ -55,8 +55,8 @@ main.o: main.f90 m_MC_step.o m_ran_gen.o magnitudes.o m_tower.o m_latt_gen.o m_c
 
 .PHONY: run
 
-# --- Configuration of the simulation ---
-TEMPS = 5.0d-2 1.0d-1 1.5d-1 2.0d-1 2.5d-1 3.0d-1 3.5d-1 4.0d-1 4.5d-1 5.0d-1
+# --- Part 2 analysis ---
+TEMPS = 5.0d-1 1.0d0 1.5d0 2.0d0 2.5d0 3.0d0 3.5d0 4.0d0 4.5d0 5.0d0
 
 .PHONY: run_all
 run_all: $(TARGET)
@@ -106,6 +106,43 @@ clean: clean_results
 # 'Make clean_results' only to cleaning directories of simulation
 clean_results:
 	@echo "Cleaning analysis files and directories..."
-	rm -rf $(DIRS)
-	rm -f *.pngç
+	rm -rf $(DIRS) results/
+	rm -f *.png
+
+#--- Part 3 analysis ----
+
+.PHONY: mott
+
+RESULTS = tm_calc.txt conductivity_vs_temp.png mott_law.png
+
+RESULTS_LOCAL = $(foreach r, $(RESULTS), results/$(r))
+
+GEN_SCRIPT = mott_law.py
+
+LOC_SCRIPT = cond_script.py
+
+
+#Y see linear polarization starting at T=1.5
+TEMP_MOTT = 1.5d0 2.0d0 2.5d0 3.0d0 3.5d0 4.0d0 4.5d0 5.0d0
+
+MOTT_COND = $(foreach t, $(TEMP_MOTT), T_$(t)/conductivity.txt)
+
+XPOL = $(foreach t, $(TEMP_MOTT), T_$(t)/xpol.txt)
+
+mott: $(RESULTS_LOCAL)
+	@echo "Mott law analysis completed. Results saved in 'results/' directory."
+
+$(RESULTS_LOCAL): $(MOTT_COND) 
+	@echo "Running general scripts for temperature $(TEMP_MOTT)."	
+	mkdir  results
+	python3 $(GEN_SCRIPT) --temps "$(TEMP_MOTT)" --output results/
+	@echo "Results obtained"
+
+
+$(MOTT_COND): $(XPOL)
+	@echo "Calculating conductivity for each temperature and ploting x polarization vs time"
+	@for t in $(TEMP_MOTT); do \
+			echo "Running T=$$t..."; \
+			python3 $(LOC_SCRIPT) --temp $$t --output T_$$t --input T_$$t/xpol.txt; \
+	done
 

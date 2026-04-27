@@ -52,11 +52,14 @@ contains
                 cycle
             end if
             !If random number is in the list, get another one
-            do while (all(rand_numb == rand_list(1:i-1)))
+            do while (any(rand_numb == rand_list(1:i-1)))
                 rand_numb = int(get_random() * lenght )+ 1
             end do
             rand_list(i) = rand_numb
         end do
+        print*, 'lenght of random list: ', size(rand_list)
+
+    
     end subroutine choose_half_random
 
 end module m_ran_gen

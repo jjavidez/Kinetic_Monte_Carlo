@@ -56,23 +56,31 @@ function coulomb_energy ( s) result(coul_energy)
 end function coulomb_energy
 
 
-function initial_energy_calc(s, phi) result(init_energy)
+function initial_energy_calc(s, phi, coord) result(init_energy)
     integer, intent(in) :: s(l_box**2)
     real(8), intent(in) :: phi(l_box**2)
-    integer :: coul_energy, coord(2, l_box**2)
+    integer, intent(in) :: coord(2, l_box**2)
+    integer :: coul_energy
     real(8) :: rand_pot, init_energy, el_energy
     
     coul_energy = coulomb_energy(s)
     rand_pot = random_pot(s, phi)
     el_energy = el_field * real(x_polarization(s, coord), 8) ! energy from electric field
     
+    print *, 'x polarization', x_polarization(s, coord)
+    print *, 'electric field', el_field
+    print *, "Initial Coulomb energy: ", coul_energy
+    print *, "Initial random potential energy: ", rand_pot
+    print *, "Initial electric field energy: ", el_energy
+
+
     init_energy = real(coul_energy, 8) + rand_pot + el_energy ! total energy
 end function initial_energy_calc
 
 function energy_change(s, dist, i, j, phi, coord) result(delta_energy)
     integer, intent(in) :: s(l_box**2), i, j, dist, coord(2, l_box**2)
     real(8), intent(in) :: phi(l_box**2)
-    real(8) :: delta_energy
+    real(8) :: delta_energy, rand_pot_change, el_energy_change
     integer :: neigh_lst_i(4), neigh_lst_j(4), coul_energy_change
     
     call neighbor(i, neigh_lst_i)
@@ -84,11 +92,15 @@ function energy_change(s, dist, i, j, phi, coord) result(delta_energy)
         coul_energy_change = -2 * sum(s(neigh_lst_i)) + 2 * sum(s(neigh_lst_j)) - 4 ! additional change from direct interaction between i and j
     end if
 
+    rand_pot_change = 2 * (phi(j) - phi(i)) ! change in random potential energy from flipping s_i and s_j
+    el_energy_change = -2 * el_field * real(dist, 8) ! change in electric field energy from flipping s_i and
     !we use x distance for the electric field contribution since the field is in the x direction
-    delta_energy = real(coul_energy_change, 8) + 2 * (phi(j) - phi(i)) -2 * el_field * real(dist, 8) ! total energy change from flip
+    delta_energy = real(coul_energy_change, 8) + rand_pot_change + el_energy_change ! total energy change from flip
 
 
-
+    !print *, "Coulomb energy change: ", coul_energy_change
+    !print *, "Random potential energy change: ", rand_pot_change
+    !print *, "Electric field energy change: ", el_energy_change
     
 end function energy_change
 
